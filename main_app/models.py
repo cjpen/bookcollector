@@ -15,3 +15,18 @@ class Book(models.Model):
     
     def get_absolute_url(self):
         return reverse('detail', kwargs={'book_id': self.id})
+
+class Bookmark(models.Model):
+    date = models.DateField('Log Date')
+    page = models.CharField('Page stopped on', max_length=5)
+
+    book = models.ForeignKey(
+        Book,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"Read until {self.page} on {self.date}"
+
+    class Meta:
+        ordering = ['-date']
