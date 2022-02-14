@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Book
-from .forms import BookmarkForm
+from django.views.generic import ListView
+from .models import Book, Genre
+from .forms import BookmarkForm, GenreForm
 
 # Create your views here.
 def home(request):
@@ -17,9 +18,14 @@ def books_index(request):
 def books_detail(request, book_id):
     book = Book.objects.get(id=book_id)
     bookmark_form = BookmarkForm()
-    return render(request, 'books/detail.html', { 
-        'book': book, 
-        'bookmark_form': bookmark_form 
+
+    genre_ids = book.genres.all().values_list('id')
+    genres = Genre.objects.exclude(id__in=genre_ids)
+
+    return render(request, 'books/detail.html', {
+        'book': book,
+        'bookmark_form': bookmark_form,
+        'genres': genres,
     })
 
 def add_bookmark(request, book_id):
@@ -42,3 +48,20 @@ class BookUpdate(UpdateView):
 class BookDelete(DeleteView):
     model = Book
     success_url = '/books/'
+
+class GenreList(ListView):
+    model = Genre
+    
+class GenreCreate(CreateView):
+    model = Genre
+    fields = ['name']
+
+def assoc_genre(request, book_id, genre_id):
+  book = Book.objects.get(id=book_id)
+  book.genres.add(genre_id)
+  return redirect('detail', book_id=book_id)
+
+def unassoc_genre(request, book_id, genre_id):
+  book = Book.objects.get(id=book_id)
+  book.genres.remove(genre_id)
+  return redirect('detail', book_id=book_id)

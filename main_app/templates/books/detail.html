@@ -40,6 +40,55 @@
     </div>
 </div>
 
+<hr>
+<div class="row">
+  <div class="col s6">
+    <h4>Genres for {{ book.title }}</h4>
+    {% if book.genres.count %}
+      {% for genre in book.genres.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              {{ genre.name }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="{% url 'unassoc_genre' book.id genre.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>No Genre Selected :(</h5>
+    {% endif %}
+  </div>
+  <!-- Available genres will come after this line -->
+  <div class="col s6">
+    <h4>Available Genres</h4>
+    {% if genres.count %}
+      {% for genre in genres.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              {{ genre.name }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="{% url 'assoc_genre' book.id genre.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>{{book.title}} Already Has All genres Available</h5>
+    {% endif %}
+  </div>
+</div>
+
 <script>
     const dateEl = document.getElementById('id_date');
     M.Datepicker.init(dateEl, {
